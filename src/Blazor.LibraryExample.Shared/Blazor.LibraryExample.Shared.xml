@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Blazor.LibraryExample.Shared</name>
+    </assembly>
+    <members>
+        <member name="T:Blazor.LibraryExample.Shared.Entities.Book">
+            <summary>
+            The Book entity
+            </summary>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.Book.Id">
+            <summary>
+            Gets or sets the identifier.
+            </summary>
+            <value>
+            The identifier.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.Book.Title">
+            <summary>
+            Gets or sets the title.
+            </summary>
+            <value>
+            The title.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.Book.Author">
+            <summary>
+            Gets or sets the author.
+            </summary>
+            <value>
+            The author.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.Book.CreationDate">
+            <summary>
+            Gets or sets the creation date.
+            </summary>
+            <value>
+            The creation date.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.Book.TotalDownloads">
+            <summary>
+            Gets or sets the total downloads.
+            </summary>
+            <value>
+            The total downloads.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.Book.InCollection">
+            <summary>
+            Gets or sets a value indicating whether the book is indise a collection
+            </summary>
+            <value>
+              <c>true</c> if [in collection]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="T:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1">
+            <summary>
+            Class to store paginated results
+            </summary>
+            <typeparam name="TItem">The type of object that will be stored as IEnumerable in the Results property</typeparam>
+        </member>
+        <member name="M:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1"/> class.
+            </summary>
+            <param name="results">The results.</param>
+            <param name="currentPage">The current page.</param>
+            <param name="resultsPerPage">The results per page.</param>
+            <param name="totalRows">The total rows.</param>
+        </member>
+        <member name="M:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1"/> class.
+            </summary>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1.Results">
+            <summary>
+            Gets the results.
+            </summary>
+            <value>
+            The results.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResults`1.PaginationInfo">
+            <summary>
+            Gets the pagination information.
+            </summary>
+            <value>
+            The pagination information.
+            </value>
+        </member>
+        <member name="T:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata">
+            <summary>
+            Class to store information about current pagination
+            </summary>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.CurrentPage">
+            <summary>
+            Gets or sets the current page.
+            </summary>
+            <value>
+            The current page.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.ResultsPerPage">
+            <summary>
+            Gets or sets the results per page.
+            </summary>
+            <value>
+            The results per page.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.TotalPages">
+            <summary>
+            Gets or sets the total pages.
+            </summary>
+            <value>
+            The total pages.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.TotalRows">
+            <summary>
+            Gets or sets the total rows.
+            </summary>
+            <value>
+            The total rows.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.HasPreviousPage">
+            <summary>
+            Gets a value indicating whether this instance has previous page.
+            </summary>
+            <value>
+              <c>true</c> if this instance has previous page; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.HasNextPage">
+            <summary>
+            Gets a value indicating whether this instance has next page.
+            </summary>
+            <value>
+              <c>true</c> if this instance has next page; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.ResultsFrom">
+            <summary>
+            Gets the results from.
+            </summary>
+            <value>
+            The results from.
+            </value>
+        </member>
+        <member name="P:Blazor.LibraryExample.Shared.Entities.PaginatedResultsMetadata.ResultsTo">
+            <summary>
+            Gets the results to.
+            </summary>
+            <value>
+            The results to.
+            </value>
+        </member>
+    </members>
+</doc>

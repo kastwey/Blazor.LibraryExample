@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Blazor.LibraryExample.Interop</name>
+    </assembly>
+    <members>
+        <member name="T:Blazor.LibraryExample.Interop.JsInterop">
+            <summary>
+            Clas to wrapp JS functions into c#functions
+            </summary>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.PromptAsync(System.String)">
+            <summary>
+            Prompts the specified message asynchronous.
+            </summary>
+            <param name="message">The message.</param>
+            <returns>true if the user press Accept, false otherwise</returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.AlertAsync(System.String)">
+            <summary>
+            Alerts the specified message asynchronous.
+            </summary>
+            <param name="message">The message.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.FocusAsync(Microsoft.AspNetCore.Blazor.ElementRef)">
+            <summary>
+            Do focus into the specified element asynchronous.
+            </summary>
+            <param name="element">The element.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.FocusAsync(System.String)">
+            <summary>
+            Do focus in the element specified by its ID.
+            </summary>
+            <param name="selector">The selector.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task" /> representing the asynchronous operation.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">selector</exception>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.FocusInHeaderAsync(System.Int32)">
+            <summary>
+            Do focus in the firs header of the specified level asynchronous.
+            </summary>
+            <param name="headerLevel">The header level.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task" /> representing the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.ClickAsync(Microsoft.AspNetCore.Blazor.ElementRef)">
+            <summary>
+            Performs click in the specified <paramref name="element" />
+            </summary>
+            <param name="element">The element.</param>
+            <returns>
+            A <see cref="T:System.Threading.Tasks.Task" /> representing the asynchronous operation.
+            </returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.SetTitleAsync(System.String)">
+            <summary>
+            Sets the page title asynchronous.
+            </summary>
+            <param name="title">The title.</param>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.GetTitleAsync">
+            <summary>
+            Gets the document title asynchronous.
+            </summary>
+            <returns>A <see cref="T:System.Threading.Tasks.Task"/> representing the asynchronous operation.</returns>
+        </member>
+        <member name="M:Blazor.LibraryExample.Interop.JsInterop.ConfirmAsync(System.String)">
+            <summary>
+            Invoke the JS confirm Function to demand confirmation for an action
+            </summary>
+            <param name="message">The message.</param>
+            <returns>True if user press in OK, false otherwise</returns>
+        </member>
+    </members>
+</doc>

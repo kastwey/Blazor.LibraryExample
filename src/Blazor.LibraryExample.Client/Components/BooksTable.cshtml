@@ -1,0 +1,194 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.Client.Dtos
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inherits ComponentBase
+@if (books == null)
+{
+	if (Type != TableType.SearchResults || !String.IsNullOrWhiteSpace(SearchTerm))
+	{
+		<p>Cargando resultados...</p>
+	}
+}
+else if (!books.Results.Any())
+{
+	<p>No se encontraron resultados.</p>
+}
+else
+{
+	<PageInfo Data="@books?.PaginationInfo" />
+	<table summary="@TableSummary" id="tblResults">
+		<thead>
+			<tr>
+				<th><a role="link" tabindex="0" id="lnkTitle" onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title@(GetOrderedByText("title"))</a></th>
+				<th><a role="link" tabindex="0" id="lnkAuthor" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author@(GetOrderedByText("author"))</a></th>
+				<th><a role="link" tabindex="0" id="lnkCreationDate" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date@(GetOrderedByText("creationDate"))</a></th>
+				<th><a role="link" tabindex="0" id="lnkNumberOfDownloads" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number@(GetOrderedByText("numberOfDownloads"))</a></th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var book in books.Results)
+			{
+				var bookForLambdas = book;
+			<tr>
+				<td><a href="/books/details/@book.Id">@book.Title</a></td>
+				<td>@book.Author</td>
+				<td>@book.CreationDate.ToString("dd/MM/yyyy")</td>
+				<td>@book.TotalDownloads</td>
+				<td><a  href="books/edit/@book.Id">Edit<span class="sr-only"> @book.Title</span></a></td>
+				<td><a role="link" tabindex="0" onclick="@(() => DeleteBook(bookForLambdas.Id))">Delete<span class="sr-only"> @bookForLambdas.Title</span></a></td>
+			</tr>
+			}
+		</tbody>
+	</table>
+	@if (Type == TableType.SearchResults)
+	{
+		<Pagination PaginationInfo="@books?.PaginationInfo" QueryStringKey="pageNumber"></Pagination>
+	}
+	else
+	{
+		<Pagination PaginationInfo="@books?.PaginationInfo"></Pagination>
+	}
+}
+
+@functions
+{
+	[Flags]
+	private enum BookOrder
+	{
+		ByTitleAscending = 1,
+		ByTitleDescending = 2,
+		ByAuthorAscending = 4,
+		ByAuthorDescending = 8,
+		ByCreationDateAscending = 16,
+		ByCreationDateDescending = 32,
+		ByNumberOFDownloadsAscending = 64,
+		ByNumberOfDownloadsDescending = 128
+	}
+
+	public enum TableType
+	{
+		Novelties,
+		MostDownloadeds,
+		SearchResults
+	}
+
+	[Parameter] int PageNumber { get; set; } = 1;
+
+	[Parameter] string TableSummary { get; set; }
+
+	[Parameter] TableType Type { get; set; }
+
+	[Parameter] string SearchTerm { get; set; }
+
+	private PaginatedResultsDto<Book> books { get; set; }
+
+	private BookOrder orderedBy { get; set; }
+
+
+	protected override void OnInit()
+	{
+		switch (Type)
+		{
+			case TableType.MostDownloadeds:
+				orderedBy = BookOrder.ByNumberOfDownloadsDescending;
+				break;
+			default:
+				orderedBy = BookOrder.ByTitleAscending;
+				break;
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await RefreshBooksAsync();
+	}
+
+	private async void DeleteBook(int bookId)
+	{
+		var result = await Interop.JsInterop.ConfirmAsync("Are you sure you want to delete this book?");
+		if (result)
+		{
+			try
+			{
+				await Http.DeleteAsync($"api/books/delete/{bookId}");
+				RootPage?.RefreshPage();
+			}
+			catch (Exception ex)
+			{
+				await Interop.JsInterop.AlertAsync("Error while removing the book: " + ex.Message);
+			}
+		}
+	}
+
+
+	private async Task RefreshBooksAsync(string focusAfterRefreshing = null)
+	{
+		if (PageNumber <= 0)
+		{
+			PageNumber = 1;
+		}
+		string url = null;
+		switch (Type)
+		{
+			case TableType.Novelties:
+				url = "api/books/novelties";
+				break;
+			case TableType.MostDownloadeds:
+				url = "api/books/mostDownloadeds";
+				break;
+			case TableType.SearchResults:
+				url = $"api/books/search?searchTerm={ SearchTerm}";
+				break;
+		}
+		try
+		{
+			url += (url.Contains("?") ? "&" : "?") +
+			$"pageNumber={PageNumber}&resultsPerPage=10&order={orderedBy}";
+
+			books = await Http.GetJsonAsync<PaginatedResultsDto<Book>>(url);
+		}
+		catch (Exception ex)
+		{
+			await Blazor.LibraryExample.Interop.JsInterop.AlertAsync("Error: " + ex.Message);
+		}
+		if (!String.IsNullOrWhiteSpace(focusAfterRefreshing))
+		{
+			if (this.RootPage != null)
+			{
+				this.RootPage.QuerySelectorToFocusAfterRendering = "#" + focusAfterRefreshing;
+			}
+		}
+	}
+
+	private async Task ReorderResultsAsync(BookOrder order, string linkId)
+	{
+		orderedBy = order;
+		await RefreshBooksAsync(linkId);
+	}
+
+	private string GetOrderedByText(string header)
+	{
+		Dictionary<string, BookOrder[]> headerDictionary = new Dictionary<string, BookOrder[]>()
+{
+{ "title", new BookOrder[] { BookOrder.ByTitleAscending, BookOrder.ByTitleDescending } },
+{ "author", new BookOrder[] { BookOrder.ByAuthorAscending, BookOrder.ByAuthorDescending } },
+{ "numberOfDownloads", new BookOrder[] { BookOrder.ByNumberOFDownloadsAscending, BookOrder.ByNumberOfDownloadsDescending } },
+{ "creationDate", new BookOrder[] { BookOrder.ByCreationDateAscending, BookOrder.ByCreationDateDescending } }
+};
+		if (!headerDictionary.ContainsKey(header))
+		{
+			throw new ArgumentException("The specified header (" + header + ") isn't inside supported headers for this function.");
+		}
+		var orders = headerDictionary[header];
+		if (orders.Contains(orderedBy))
+		{
+			return $" ({(orderedBy.ToString().EndsWith("ascending", StringComparison.InvariantCultureIgnoreCase) ? "Sorted in ascending order" : "Sorted in descending order")})";
+		}
+		return String.Empty;
+	}
+
+
+}
+

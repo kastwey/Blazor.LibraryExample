@@ -1,0 +1,57 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@page "/books/details/{bookId}"
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+@if (loadingBook)
+{
+	<h2>Details of the book</h2>
+	<p>Loading...</p>
+}
+else if (book == null)
+{
+	<h2>Book not found</h2>
+	<p>The book with the specified identifier was not found.</p>
+}
+else
+{
+	<h2>Details of the book @book.Title, by @book.Author</h2>
+	<dl>
+		<dt>Title::</dt>
+		<dd>@book.Title</dd>
+		<dt>Author:</dt>
+		<dd>@book.Author</dd>
+		<dt>Creation date:</dt>
+		<dd>@book.CreationDate.ToString("dd/MM/yyyy")</dd>
+		<dt>Total downloads:</dt>
+		<dd>@book.TotalDownloads</dd>
+		<dt>Is part of a collection:</dt>
+		<dd>@(book.InCollection ? "Sí" : "No")</dd>
+	</dl>
+}
+
+@functions
+{
+	[Parameter] string BookId { get; set; }
+
+	Book book;
+
+	bool loadingBook = true;
+	protected override async Task OnInitAsync()
+	{
+		try
+		{
+			book = await Http.GetJsonAsync<Book>($"api/books/details/{BookId}");
+			this.Title = $"Details of the book {book.Title}, de {book.Author}";
+		}
+		catch (Exception ex)
+		{
+			this.Title = "Detalles de un libro";
+			await JsInterop.AlertAsync("Error when retrieving the book: " + ex.Message);
+		}
+		finally
+		{
+			loadingBook = false;
+		}
+	}
+}

@@ -1,0 +1,13 @@
+﻿@functions
+{
+
+	[Parameter] protected CustomPage RootPage { get; set; }
+
+	protected override async Task OnAfterRenderAsync()
+	{
+		if (RootPage != null && !String.IsNullOrWhiteSpace(RootPage.QuerySelectorToFocusAfterRendering))
+		{
+			await RootPage.DoDefaultFocus();
+		}
+	}
+}

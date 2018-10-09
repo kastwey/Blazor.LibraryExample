@@ -1,0 +1,26 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.Client.Components
+@using Blazor.LibraryExample.Client.Dtos
+@page "/books/mostDownloadeds/{PageNumber}"
+@page "/books/mostDownloadeds"
+<h2>Books most downloaded, page @PageNumber</h2>
+<p><a href="/books/add">Add new book</a></p>
+<BooksTable PageNumber="@PageNumber" Type="@BooksTable.TableType.MostDownloadeds" TableSummary="Table with the twenty most downloaded books by our readers" RootPage=@this />
+@functions
+{
+	[Parameter] string SPageNumber { get; set; } = "1";
+
+	protected int PageNumber
+	{
+		get
+		{
+			return Int32.TryParse(SPageNumber, out int pageNumber) ? pageNumber : 1;
+		}
+	}
+
+	protected override Task OnInitAsync()
+	{
+		this.Title = "Libros más descargados";
+		return Task.CompletedTask;
+	}
+}

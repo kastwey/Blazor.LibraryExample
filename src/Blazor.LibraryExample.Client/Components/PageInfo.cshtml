@@ -1,0 +1,12 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.Client.Dtos
+
+@if (Data != null && Data.TotalRows > 0)
+{
+	<p>Showing results from @Data.ResultsFrom to @Data.ResultsTo. Page @Data.CurrentPage of @Data.TotalPages.</p>
+}
+
+@functions
+{
+	[Parameter] PaginatedResultsMetadataDto Data { get; set; }
+}

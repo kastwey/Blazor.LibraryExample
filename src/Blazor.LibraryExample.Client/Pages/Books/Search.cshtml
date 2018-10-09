@@ -1,0 +1,79 @@
+﻿@using Microsoft.AspNetCore.WebUtilities
+@using Blazor.LibraryExample.Client.Components
+@page "/books/search/"
+@implements IDisposable
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+<h2>Search</h2>
+	<label for="TxtSearch">Search:</label>
+	<input type="search" id="txtSearch" bind="txtSearch" onkeypress="@TxtSearchKeypress" />
+	<button onclick="@SearchBooks" ref="btnSearch">Search books</button>
+@if (!String.IsNullOrWhiteSpace(searchTerm))
+{
+	<h3 id="headerResults">Search results:</h3>
+	<BooksTable TableSummary="Table with search results." Type="@BooksTable.TableType.SearchResults" PageNumber="@pageNumber" SearchTerm=@searchTerm RootPage=@this></BooksTable>
+}
+
+@functions
+{
+
+private int pageNumber { get; set; }
+
+private string searchTerm { get; set; }
+
+private string txtSearch { get; set; }
+
+private ElementRef btnSearch;
+
+private async void TxtSearchKeypress(UIKeyboardEventArgs e)
+{
+	if (e.Key == "Enter")
+	{
+		await Interop.JsInterop.FocusAsync(btnSearch);
+		await Interop.JsInterop.ClickAsync(btnSearch);
+	}
+}
+
+protected override void OnInit()
+{
+	this.Title = "Search books";
+	GetQueryStringParameters();
+	UriHelper.OnLocationChanged += OnLocationChanges;
+	base.OnInit();
+}
+
+private void OnLocationChanges(object sender, string location) => GetQueryStringParameters();
+
+private void GetQueryStringParameters()
+{
+	var uri = new Uri(UriHelper.GetAbsoluteUri());
+	searchTerm = QueryHelpers.ParseQuery(uri.Query).TryGetValue("searchTerm", out var oSearchTerm) ? oSearchTerm.First() : "";
+	var hasPageNumber = QueryHelpers.ParseQuery(uri.Query).TryGetValue("pageNumber", out var oPageNumber);
+	if (!hasPageNumber || !Int32.TryParse(oPageNumber.First(), out var intPageNumber))
+	{
+		pageNumber = 1;
+	}
+	else
+	{
+		pageNumber = intPageNumber;
+	}
+	this.QuerySelectorToFocusAfterRendering = "#headerResults";
+	StateHasChanged();
+}
+
+public override void Dispose()
+{
+	UriHelper.OnLocationChanged -= OnLocationChanges;
+	base.Dispose();
+}
+
+private async void SearchBooks()
+{
+	if (String.IsNullOrWhiteSpace(txtSearch))
+	{
+		this.QuerySelectorToFocusAfterRendering = "#txtSearch";
+		return;
+	}
+	UriHelper.NavigateTo($"/books/search?searchTerm={txtSearch}&pageNumber={pageNumber}");
+}
+
+}
