@@ -7,12 +7,12 @@
 {
 	if (Type != TableType.SearchResults || !String.IsNullOrWhiteSpace(SearchTerm))
 	{
-		<p>Cargando resultados...</p>
+		<p>Loading results...</p>
 	}
 }
 else if (!books.Results.Any())
 {
-	<p>No se encontraron resultados.</p>
+	<p>No results found.</p>
 }
 else
 {
