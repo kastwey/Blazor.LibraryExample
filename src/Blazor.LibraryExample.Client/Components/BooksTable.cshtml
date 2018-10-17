@@ -17,14 +17,15 @@ else if (!books.Results.Any())
 else
 {
 	<PageInfo Data="@books?.PaginationInfo" />
-	<table summary="@TableSummary" id="tblResults">
+	<table class="table" summary="@TableSummary" id="tblResults">
 		<thead>
 			<tr>
-				<th><a role="link" tabindex="0" id="lnkTitle" onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title@(GetOrderedByText("title"))</a></th>
-				<th><a role="link" tabindex="0" id="lnkAuthor" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author@(GetOrderedByText("author"))</a></th>
-				<th><a role="link" tabindex="0" id="lnkCreationDate" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date@(GetOrderedByText("creationDate"))</a></th>
-				<th><a role="link" tabindex="0" id="lnkNumberOfDownloads" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number@(GetOrderedByText("numberOfDownloads"))</a></th>
-				<th>Actions</th>
+				<th style="width: 30%"><a role="link" tabindex="0" id="lnkTitle" onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title@(GetOrderedByText("title"))</a></th>
+				<th style="width: 20%"><a role="link" tabindex="0" id="lnkAuthor" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author@(GetOrderedByText("author"))</a></th>
+				<th style="width: 10%"><a role="link" tabindex="0" id="lnkCreationDate" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date@(GetOrderedByText("creationDate"))</a></th>
+				<th style="width : 20%"><a role="link" tabindex="0" id="lnkNumberOfDownloads" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number@(GetOrderedByText("numberOfDownloads"))</a></th>
+				<th style="width: 15%">Actions</th>
+                <th style="width: 15%"></th>
 			</tr>
 		</thead>
 		<tbody>
