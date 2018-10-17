@@ -20,10 +20,10 @@ else
 	<table class="table" summary="@TableSummary" id="tblResults">
 		<thead>
 			<tr>
-				<th style="width: 30%"><a role="link" tabindex="0" id="lnkTitle" onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title@(GetOrderedByText("title"))</a></th>
-				<th style="width: 20%"><a role="link" tabindex="0" id="lnkAuthor" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author@(GetOrderedByText("author"))</a></th>
-				<th style="width: 10%"><a role="link" tabindex="0" id="lnkCreationDate" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date@(GetOrderedByText("creationDate"))</a></th>
-				<th style="width : 20%"><a role="link" tabindex="0" id="lnkNumberOfDownloads" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number@(GetOrderedByText("numberOfDownloads"))</a></th>
+				<th style="width: 30%"><a role="link" tabindex="0" id="lnkTitle" onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title </a><span class="@GetOrderedByText("title")"></span></th>
+				<th style="width: 20%"><a role="link" tabindex="0" id="lnkAuthor" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author </a><span class="@GetOrderedByText("author")"></span></th>
+				<th style="width: 10%"><a role="link" tabindex="0" id="lnkCreationDate" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date </a><span class="@GetOrderedByText("creationDate")"></span></th>
+				<th style="width : 20%"><a role="link" tabindex="0" id="lnkNumberOfDownloads" onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number </a><span class="@GetOrderedByText("numberOfDownloads")"></span></th>
 				<th style="width: 15%">Actions</th>
                 <th style="width: 15%"></th>
 			</tr>
@@ -55,140 +55,140 @@ else
 
 @functions
 {
-	[Flags]
-	private enum BookOrder
-	{
-		ByTitleAscending = 1,
-		ByTitleDescending = 2,
-		ByAuthorAscending = 4,
-		ByAuthorDescending = 8,
-		ByCreationDateAscending = 16,
-		ByCreationDateDescending = 32,
-		ByNumberOFDownloadsAscending = 64,
-		ByNumberOfDownloadsDescending = 128
-	}
+    [Flags]
+    private enum BookOrder
+    {
+        ByTitleAscending = 1,
+        ByTitleDescending = 2,
+        ByAuthorAscending = 4,
+        ByAuthorDescending = 8,
+        ByCreationDateAscending = 16,
+        ByCreationDateDescending = 32,
+        ByNumberOFDownloadsAscending = 64,
+        ByNumberOfDownloadsDescending = 128
+    }
 
-	public enum TableType
-	{
-		Novelties,
-		MostDownloadeds,
-		SearchResults
-	}
+    public enum TableType
+    {
+        Novelties,
+        MostDownloadeds,
+        SearchResults
+    }
 
-	[Parameter] int PageNumber { get; set; } = 1;
+    [Parameter] int PageNumber { get; set; } = 1;
 
-	[Parameter] string TableSummary { get; set; }
+    [Parameter] string TableSummary { get; set; }
 
-	[Parameter] TableType Type { get; set; }
+    [Parameter] TableType Type { get; set; }
 
-	[Parameter] string SearchTerm { get; set; }
+    [Parameter] string SearchTerm { get; set; }
 
-	private PaginatedResultsDto<Book> books { get; set; }
+    private PaginatedResultsDto<Book> books { get; set; }
 
-	private BookOrder orderedBy { get; set; }
-
-
-	protected override void OnInit()
-	{
-		switch (Type)
-		{
-			case TableType.MostDownloadeds:
-				orderedBy = BookOrder.ByNumberOfDownloadsDescending;
-				break;
-			default:
-				orderedBy = BookOrder.ByTitleAscending;
-				break;
-		}
-	}
-
-	protected override async Task OnParametersSetAsync()
-	{
-		await RefreshBooksAsync();
-	}
-
-	private async void DeleteBook(int bookId)
-	{
-		var result = await Interop.JsInterop.ConfirmAsync("Are you sure you want to delete this book?");
-		if (result)
-		{
-			try
-			{
-				await Http.DeleteAsync($"api/books/delete/{bookId}");
-				RootPage?.RefreshPage();
-			}
-			catch (Exception ex)
-			{
-				await Interop.JsInterop.AlertAsync("Error while removing the book: " + ex.Message);
-			}
-		}
-	}
+    private BookOrder orderedBy { get; set; }
 
 
-	private async Task RefreshBooksAsync(string focusAfterRefreshing = null)
-	{
-		if (PageNumber <= 0)
-		{
-			PageNumber = 1;
-		}
-		string url = null;
-		switch (Type)
-		{
-			case TableType.Novelties:
-				url = "api/books/novelties";
-				break;
-			case TableType.MostDownloadeds:
-				url = "api/books/mostDownloadeds";
-				break;
-			case TableType.SearchResults:
-				url = $"api/books/search?searchTerm={ SearchTerm}";
-				break;
-		}
-		try
-		{
-			url += (url.Contains("?") ? "&" : "?") +
-			$"pageNumber={PageNumber}&resultsPerPage=10&order={orderedBy}";
+    protected override void OnInit()
+    {
+        switch (Type)
+        {
+            case TableType.MostDownloadeds:
+                orderedBy = BookOrder.ByNumberOfDownloadsDescending;
+                break;
+            default:
+                orderedBy = BookOrder.ByTitleAscending;
+                break;
+        }
+    }
 
-			books = await Http.GetJsonAsync<PaginatedResultsDto<Book>>(url);
-		}
-		catch (Exception ex)
-		{
-			await Blazor.LibraryExample.Interop.JsInterop.AlertAsync("Error: " + ex.Message);
-		}
-		if (!String.IsNullOrWhiteSpace(focusAfterRefreshing))
-		{
-			if (this.RootPage != null)
-			{
-				this.RootPage.QuerySelectorToFocusAfterRendering = "#" + focusAfterRefreshing;
-			}
-		}
-	}
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshBooksAsync();
+    }
 
-	private async Task ReorderResultsAsync(BookOrder order, string linkId)
-	{
-		orderedBy = order;
-		await RefreshBooksAsync(linkId);
-	}
+    private async void DeleteBook(int bookId)
+    {
+        var result = await Interop.JsInterop.ConfirmAsync("Are you sure you want to delete this book?");
+        if (result)
+        {
+            try
+            {
+                await Http.DeleteAsync($"api/books/delete/{bookId}");
+                RootPage?.RefreshPage();
+            }
+            catch (Exception ex)
+            {
+                await Interop.JsInterop.AlertAsync("Error while removing the book: " + ex.Message);
+            }
+        }
+    }
 
-	private string GetOrderedByText(string header)
-	{
-		Dictionary<string, BookOrder[]> headerDictionary = new Dictionary<string, BookOrder[]>()
+
+    private async Task RefreshBooksAsync(string focusAfterRefreshing = null)
+    {
+        if (PageNumber <= 0)
+        {
+            PageNumber = 1;
+        }
+        string url = null;
+        switch (Type)
+        {
+            case TableType.Novelties:
+                url = "api/books/novelties";
+                break;
+            case TableType.MostDownloadeds:
+                url = "api/books/mostDownloadeds";
+                break;
+            case TableType.SearchResults:
+                url = $"api/books/search?searchTerm={ SearchTerm}";
+                break;
+        }
+        try
+        {
+            url += (url.Contains("?") ? "&" : "?") +
+            $"pageNumber={PageNumber}&resultsPerPage=10&order={orderedBy}";
+
+            books = await Http.GetJsonAsync<PaginatedResultsDto<Book>>(url);
+        }
+        catch (Exception ex)
+        {
+            await Blazor.LibraryExample.Interop.JsInterop.AlertAsync("Error: " + ex.Message);
+        }
+        if (!String.IsNullOrWhiteSpace(focusAfterRefreshing))
+        {
+            if (this.RootPage != null)
+            {
+                this.RootPage.QuerySelectorToFocusAfterRendering = "#" + focusAfterRefreshing;
+            }
+        }
+    }
+
+    private async Task ReorderResultsAsync(BookOrder order, string linkId)
+    {
+        orderedBy = order;
+        await RefreshBooksAsync(linkId);
+    }
+
+    private string GetOrderedByText(string header)
+    {
+        Dictionary<string, BookOrder[]> headerDictionary = new Dictionary<string, BookOrder[]>()
 {
 { "title", new BookOrder[] { BookOrder.ByTitleAscending, BookOrder.ByTitleDescending } },
 { "author", new BookOrder[] { BookOrder.ByAuthorAscending, BookOrder.ByAuthorDescending } },
 { "numberOfDownloads", new BookOrder[] { BookOrder.ByNumberOFDownloadsAscending, BookOrder.ByNumberOfDownloadsDescending } },
 { "creationDate", new BookOrder[] { BookOrder.ByCreationDateAscending, BookOrder.ByCreationDateDescending } }
 };
-		if (!headerDictionary.ContainsKey(header))
-		{
-			throw new ArgumentException("The specified header (" + header + ") isn't inside supported headers for this function.");
-		}
-		var orders = headerDictionary[header];
-		if (orders.Contains(orderedBy))
-		{
-			return $" ({(orderedBy.ToString().EndsWith("ascending", StringComparison.InvariantCultureIgnoreCase) ? "Sorted in ascending order" : "Sorted in descending order")})";
-		}
-		return String.Empty;
-	}
+        if (!headerDictionary.ContainsKey(header))
+        {
+            throw new ArgumentException("The specified header (" + header + ") isn't inside supported headers for this function.");
+        }
+        var orders = headerDictionary[header];
+        if (orders.Contains(orderedBy))
+        {
+            return $" {(orderedBy.ToString().EndsWith("ascending", StringComparison.InvariantCultureIgnoreCase) ? "oi oi-arrow-top" : "oi oi-arrow-bottom")}";
+        }
+        return String.Empty;
+    }
 
 
 }
