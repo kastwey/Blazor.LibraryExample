@@ -96,7 +96,7 @@ app {
     }
 
     .sidebar {
-        width: 250px;
+        width: 266px;
         height: 100vh;
         position: sticky;
         top: 0;
@@ -125,4 +125,13 @@ app {
 	position: absolute !important;
 	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
 	clip: rect(1px, 1px, 1px, 1px);
+}
+
+/*TABLES*/
+table {
+    word-wrap: break-word;
+}
+
+table thead tr th a{
+    cursor: pointer;
 }
