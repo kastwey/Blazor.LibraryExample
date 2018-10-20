@@ -3,7 +3,7 @@
 @using Blazor.LibraryExample.Client.Dtos
 @page "/books/Novelties/{SPageNumber}"
 @page "/books/Novelties"
-<h2>Editorial news in this month, página @PageNumber</h2>
+<h2>Editorial news in this month, page @PageNumber</h2>
 <p><a href="/books/add">Add new book</a></p>
 <BooksTable PageNumber="@PageNumber" Type="@BooksTable.TableType.Novelties" TableSummary="Table with editorial news in this month" RootPage=@this></BooksTable>
 @functions			
