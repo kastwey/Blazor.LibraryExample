@@ -38,6 +38,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Blazor.LibraryExample.Interop\Blazor.LibraryExample.Interop.csproj" />
     <ProjectReference Include="..\Blazor.LibraryExample.Shared\Blazor.LibraryExample.Shared.csproj" />
+    <ProjectReference Include="..\EpubReader.Library\EpubReader.Library.csproj" />
   </ItemGroup>
 
   <ItemGroup>

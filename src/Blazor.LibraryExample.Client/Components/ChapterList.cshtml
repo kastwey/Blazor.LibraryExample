@@ -1,0 +1,35 @@
+﻿@using Blazor.LibraryExample.Client.Dtos
+@using System.Text
+@using Microsoft.AspNetCore.Blazor
+@using Microsoft.AspNetCore.Blazor.RenderTree
+@using EpubReader.Library
+<ul>
+	@foreach (var chapter in chapters)
+	{
+		@(new MarkupString(RenderChapterList(chapter)))
+	}
+</ul>
+
+@functions
+{
+	[Parameter]
+	public IEnumerable<EpubChapterRef> chapters { get; set; }
+
+	private string RenderChapterList(EpubChapterRef chapter)
+	{
+		StringBuilder strBuilder = new StringBuilder();
+		strBuilder.AppendLine($"<li><a href=\"/\">{chapter.Title}</a>");
+		if (chapter.SubChapters!= null && chapter.SubChapters.Count() > 0)
+		{
+			strBuilder.AppendLine("<ul>");
+			foreach (var subchapter in chapter.SubChapters)
+			{
+				strBuilder.Append(RenderChapterList(subchapter));
+			}
+			strBuilder.AppendLine("</ul>");
+		}
+		strBuilder.AppendLine("</li>");
+		return strBuilder.ToString();
+
+	}
+}

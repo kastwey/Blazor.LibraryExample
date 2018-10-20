@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.LibraryExample.Share
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.LibraryExample.Interop", "Blazor.LibraryExample.Interop\Blazor.LibraryExample.Interop.csproj", "{1B8A76BA-33D1-40D0-8DF8-ACBA9FC39E58}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EpubReader.Library", "EpubReader.Library\EpubReader.Library.csproj", "{1317EBD5-B5E7-43FD-9655-FCC3D7E303BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1B8A76BA-33D1-40D0-8DF8-ACBA9FC39E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B8A76BA-33D1-40D0-8DF8-ACBA9FC39E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B8A76BA-33D1-40D0-8DF8-ACBA9FC39E58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1317EBD5-B5E7-43FD-9655-FCC3D7E303BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1317EBD5-B5E7-43FD-9655-FCC3D7E303BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1317EBD5-B5E7-43FD-9655-FCC3D7E303BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1317EBD5-B5E7-43FD-9655-FCC3D7E303BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

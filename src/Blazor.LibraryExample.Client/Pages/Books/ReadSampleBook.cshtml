@@ -1,0 +1,98 @@
+﻿@using System.Text
+@using Blazor.LibraryExample.Client.Extensions
+@using EpubReader.Library
+@page "/books/ReadSampleBook"
+@page "/books/ReadSampleBook/{chapterFilename}"
+@inject HttpClient httpClient
+@if (file == null)
+{
+	<h2>Reading a book...</h2>
+	<p>Loading book...</p>
+}
+else
+{
+	if (book != null)
+	{
+		<h2>Reading book: @book.Title, by @book.Author</h2>
+		@if (chapters != null)
+		{
+
+			<ul>
+				@foreach (var chapter in chapters)
+				{
+					@(new MarkupString(RenderChapterList(chapter)))
+				}
+			</ul>
+			if (activeChapter != null)
+			{
+				<h3 id="headerChapterContent">@activeChapter.Title</h3>
+				@chapterContent
+			}
+		}
+	}
+}
+
+@functions
+{
+
+	[Parameter] public string ChapterFilename { get; set; }
+
+	private byte[] file = null;
+	private EpubBookRef book = null;
+	private List<EpubChapterRef> chapters = null;
+	private List<EpubChapterRef> flattenedChapters = null;
+	private MarkupString chapterContent;
+	private EpubChapterRef activeChapter = null;
+
+
+	protected override async Task OnInitAsync()
+	{
+		file = await httpClient.GetByteArrayAsync("/api/books/ReadSampleBook");
+		book = await EpubReader.OpenBookAsync(file);
+		chapters = await book.GetChaptersAsync();
+		flattenedChapters = chapters.Flatten();
+		if (!String.IsNullOrWhiteSpace(ChapterFilename))
+		{
+			await RenderChapterContentAsync(System.Web.HttpUtility.UrlDecode(ChapterFilename));
+		}
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!String.IsNullOrWhiteSpace(ChapterFilename))
+		{
+			await RenderChapterContentAsync(System.Web.HttpUtility.UrlDecode(ChapterFilename));
+		}
+	}
+
+
+	private string RenderChapterList(EpubChapterRef chapter)
+	{
+		var chapterForLambda = chapter;
+		StringBuilder strBuilder = new StringBuilder();
+		strBuilder.AppendLine($"<li><a href =\"/books/ReadSampleBook/{System.Web.HttpUtility.UrlEncode(chapter.ContentFileName)}\">{chapter.Title}</a>");
+		if (chapter.SubChapters != null && chapter.SubChapters.Count() > 0)
+		{
+			strBuilder.AppendLine("<ul>");
+			foreach (var subchapter in chapter.SubChapters)
+			{
+				strBuilder.Append(RenderChapterList(subchapter));
+			}
+			strBuilder.AppendLine("</ul>");
+		}
+		strBuilder.AppendLine("</li>");
+		return strBuilder.ToString();
+	}
+
+	private async Task RenderChapterContentAsync(string filename)
+	{
+		var chapterRef = flattenedChapters.SingleOrDefault(c => c.ContentFileName == filename);
+		if (chapterRef != null)
+		{
+			var htmlContent = await chapterRef.ReadHtmlContentAsync();
+			activeChapter = chapterRef;
+			chapterContent = new MarkupString(htmlContent);
+			this.QuerySelectorToFocusAfterRendering = "#headerChapterContent";
+		}
+	}
+}

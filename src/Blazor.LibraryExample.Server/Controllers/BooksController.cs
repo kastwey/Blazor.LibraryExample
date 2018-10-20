@@ -118,5 +118,12 @@
 			await booksRepository.DeleteAsync(bookId);
 			return NoContent();
 		}
+
+		[HttpGet("ReadSampleBook")]
+		public async Task<IActionResult> ReadSampleBook()
+		{
+			return File(System.IO.File.ReadAllBytes("Files/perro.epub"), "application/epub+zip");
+		}
+
 	}
 }

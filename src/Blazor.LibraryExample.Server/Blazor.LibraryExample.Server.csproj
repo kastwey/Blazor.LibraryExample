@@ -56,4 +56,13 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Files\perro.epub">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Files\regenta.epub">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
