@@ -26,7 +26,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\EpubReader.Library\EpubReader.Library.csproj" />
     <ProjectReference Include="..\Blazor.LibraryExample.Interop\Blazor.LibraryExample.Interop.csproj" />
     <ProjectReference Include="..\Shared\Blazor.LibraryExample.Shared.csproj" />
   </ItemGroup>

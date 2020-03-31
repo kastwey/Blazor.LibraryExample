@@ -17,7 +17,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
-		environmentInfo = $"Machine name: {Environment.MachineName}. User name: t+nvironment.UserName}. OS version: {Environment.OSVersion}";
+		environmentInfo = $"Machine name: {Environment.MachineName}. User name: {Environment.UserName}. OS version: {Environment.OSVersion}";
 
 	}
 	private async Task DeleteAll_Click()
