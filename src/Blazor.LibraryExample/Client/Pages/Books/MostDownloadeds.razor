@@ -1,0 +1,42 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.Client.Components
+@using Blazor.LibraryExample.Client.Dtos
+@using  Blazor.LibraryExample.Client.Contracts.Agents
+@using  Blazor.LibraryExample.Client.Events
+
+@page "/books/mostDownloadeds/{SPageNumber}"
+@page "/books/mostDownloadeds"
+@inject IBookAgent BookAgent
+@inject NavigationManager  NavigationManager
+<h2>Books most downloaded, page @PageNumber</h2>
+<p><a href="/books/add">Add new book</a></p>
+<BooksTable PageNumber="@PageNumber" Type="@TableType.MostDownloadeds" TableSummary="Table with the twenty most downloaded books by our readers" RootPage="@this" Books="@books" OnHeaderClicked="@OnHeaderClicked" />
+@code
+{
+	[Parameter] public string SPageNumber { get; set; } = "1";
+
+	protected int PageNumber
+	{
+		get
+		{
+			return Int32.TryParse(SPageNumber, out int pageNumber) ? pageNumber : 1;
+		}
+	}
+
+	private PaginatedResultsDto<Book> books;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await base.OnParametersSetAsync();
+		this.Title = "Most downloaded books";
+		this.books = await BookAgent.GetBooksAsync(TableType.MostDownloadeds, BookOrder.ByNumberOfDownloadsDescending, string.Empty, PageNumber);
+	}
+
+	private async Task OnHeaderClicked(BooksTableHeaderClickedEventArgs e)
+	{
+		books = null;
+		StateHasChanged();
+		books = await BookAgent.GetBooksAsync(TableType.MostDownloadeds, e.BookOrder, string.Empty, PageNumber);
+		this.QuerySelectorToFocusAfterRendering = $"#{e.LinkId}";
+	}
+}

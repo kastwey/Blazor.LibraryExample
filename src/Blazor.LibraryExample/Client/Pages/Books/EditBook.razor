@@ -1,0 +1,124 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.Client.Contracts.Services
+@page "/books/edit/{BookId}"
+@inject HttpClient Http
+@inject IBookService  BookService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime  JSRuntime
+
+@if (loadingBook)
+{
+	<h2>Edit book</h2>
+	<p>Loading...</p>
+}
+else if (book == null)
+{
+	<h2>Book not found</h2>
+	<p>The book with that identifier was not found.</p>
+}
+else
+{
+	<h2>Editing the book @bookTitle, by @bookAuthor</h2>
+	@if (errors.Any())
+	{
+		<h3 id="headerValidationSummary">Check the following errors:</h3>
+		<ul>
+			@foreach (var error in errors)
+			{
+				<li>@error</li>
+			}
+		</ul>
+	}
+	<div class="form" @onkeypress="SendFormWithEnter">
+		<div class="form-group">
+			<label class="control-label" for="txtTitle">Title:</label>
+			<input id="txtTitle" type="text" @bind=book.Title />
+		</div>
+		<div class="form-group">
+			<label for="txtAuthor">Author:</label>
+			<input id="txtAuthor" type="text" @bind=book.Author />
+		</div>
+		<div class="form-group">
+			<input type="checkbox" id="chkCollection" @bind="book.InCollection" />
+			<label for="chkCollection">Is part of a collection</label>
+		</div>
+		<div class="form-group">
+			<button @onclick=@Edit disabled="@(editing  ? "true" : null)" @ref="btnEdit">Edit book</button>
+		</div>
+	</div>
+}
+
+@code
+{
+[Parameter] public string BookId { get; set; }
+
+private Book book;
+
+private bool loadingBook = true;
+
+private string bookTitle, bookAuthor;
+
+private bool editing = false;
+
+private ElementReference btnEdit;
+
+private List<string> errors = new List<string>();
+
+protected override async Task OnInitializedAsync()
+{
+	try
+	{
+		book = await Http.GetJsonAsync<Book>($"api/books/details/{BookId}");
+		if (book != null)
+		{
+			bookTitle = book.Title;
+			bookAuthor = book.Author;
+			this.Title = $"Editing the book {bookTitle}, by {bookAuthor}";
+		}
+	}
+	catch (Exception ex)
+	{
+		this.Title = "Editing a book";
+		await JsInterop.AlertAsync(JSRuntime, "Error when retrieving the book: " + ex.Message);
+	}
+	finally
+	{
+		loadingBook = false;
+	}
+}
+
+private async Task SendFormWithEnter(KeyboardEventArgs e)
+{
+	if (e.Key == "Enter")
+	{
+		await Interop.JsInterop.FocusAsync(JSRuntime, btnEdit);
+		await Interop.JsInterop.ClickAsync(JSRuntime, btnEdit);
+	}
+}
+
+private async Task Edit()
+{
+	errors = BookService.Validate(book);
+	if (errors.Any())
+	{
+		this.QuerySelectorToFocusAfterRendering = "#headerValidationSummary";
+		return;
+	}
+	try
+	{
+		editing = true;
+		await Http.PutJsonAsync($"api/books/edit/{BookId}", book);
+		NavigationManager.NavigateTo($"/books/details/{BookId}");
+	}
+	catch (Exception ex)
+	{
+		await JsInterop.AlertAsync(JSRuntime, "Error when editing the book: " + ex.Message);
+	}
+	finally
+	{
+		editing = false;
+	}
+}
+
+
+}

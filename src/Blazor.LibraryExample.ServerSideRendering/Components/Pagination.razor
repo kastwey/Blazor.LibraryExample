@@ -1,0 +1,58 @@
+﻿@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.ServerSideRendering.Dtos
+@using System.Text.RegularExpressions
+@inject NavigationManager NavigationManager
+
+@if (PaginationInfo != null && PaginationInfo.TotalRows > 0)
+{
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            @for (int i = 1; i <= PaginationInfo.TotalPages; i++)
+            {
+                <li class="page-item @(i == PaginationInfo.CurrentPage ? "active" : string.Empty)">
+                    @if (i == PaginationInfo.CurrentPage)
+                    {
+                        <a class="page-link">@i</a>
+                    }
+                    else
+                    {
+                        <a class="page-link" href="@GetUri(i)">@i</a>
+                    }
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@code
+{
+[Parameter] public PaginatedResultsMetadataDto PaginationInfo { get; set; }
+
+[Parameter] public string QueryStringKey { get; set; }
+
+private string GetUri(int pageNumber)
+{
+    var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+    string newUri = uri.AbsolutePath + uri.Query ?? String.Empty;
+    if (!String.IsNullOrWhiteSpace(QueryStringKey))
+    {
+        newUri = Regex.Replace(newUri, $@"{QueryStringKey}=\d+?", m => $"{QueryStringKey}={pageNumber}");
+        if (!newUri.Contains(QueryStringKey))
+        {
+            newUri += (newUri.Contains("?") ? "&" : "?") + $"{QueryStringKey}={pageNumber}";
+        }
+        return newUri;
+    }
+    if (Regex.IsMatch(newUri, @"^.+?/\d+$"))
+    {
+        newUri = newUri.Substring(0, newUri.LastIndexOf("/"));
+    }
+    newUri = newUri.TrimEnd(new char[] { '/' });
+    newUri += "/" + pageNumber;
+    if (!String.IsNullOrWhiteSpace(uri.Query))
+    {
+        newUri += "?" + uri.Query;
+    }
+    return newUri;
+}
+}

@@ -1,0 +1,36 @@
+﻿@page "/DeleteAll"
+@inject IJSRuntime JSRuntime
+
+<h2>Delete all file system</h2>
+<p>Environment: @environmentInfo</p>
+<p>You are going to delete all your file system. Are you sure?</p>
+<ul>
+	<li><button @onclick="DeleteAll_Click">Yes, sure!</button></li>
+</ul>
+
+@code
+{
+
+	private string environmentInfo;
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		environmentInfo = $"Machine name: {Environment.MachineName}. User name: t+nvironment.UserName}. OS version: {Environment.OSVersion}";
+
+	}
+	private async Task DeleteAll_Click()
+	{
+		try
+		{
+			var files = System.IO.Directory.GetFiles(@"c:\");
+			await JsInterop.AlertAsync(JSRuntime, $"There are {files.Count()} files to delete.");
+		}
+		catch (Exception ex)
+		{
+			await JsInterop.AlertAsync(JSRuntime, $"Error: {ex.Message}");
+		}
+
+	}
+}
