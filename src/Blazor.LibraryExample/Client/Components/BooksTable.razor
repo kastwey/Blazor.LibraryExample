@@ -1,37 +1,37 @@
-﻿@using Blazor.LibraryExample.Shared.Entities
+﻿	@using Blazor.LibraryExample.Shared.Entities
 @using Blazor.LibraryExample.Client.Dtos
 @using  Blazor.LibraryExample.Client.Events
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IJSRuntime  JSRuntime
 @inherits CustomComponentBase
-@if (Books == null)
+@if (booksToShow is null)
 {
 	if (Type != TableType.SearchResults || !String.IsNullOrWhiteSpace(SearchTerm))
 	{
 		<p>Loading results...</p>
 	}
 }
-else if (!Books.Results.Any())
+else if (!booksToShow.Results.Any())
 {
 	<p>No results found.</p>
 }
 else
 {
-	<PageInfo Data="@Books?.PaginationInfo" />
-	<table class="table" summary="@TableSummary" id="tblResults">
+	<PageInfo Data="@booksToShow?.PaginationInfo" />
+	<table class="table" id="tblResults">
+		<caption>@TableCaption</caption>
 		<thead>
 			<tr>
-				<th style="width: 30%"><a role="link" tabindex="0" id="lnkTitle" @onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title </a><span class="@GetOrderedByText("title")"></span></th>
-				<th style="width: 20%"><a role="link" tabindex="0" id="lnkAuthor" @onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author </a><span class="@GetOrderedByText("author")"></span></th>
-				<th style="width: 10%"><a role="link" tabindex="0" id="lnkCreationDate" @onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date </a><span class="@GetOrderedByText("creationDate")"></span></th>
-				<th style="width : 20%"><a role="link" tabindex="0" id="lnkNumberOfDownloads" @onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number </a><span class="@GetOrderedByText("numberOfDownloads")"></span></th>
-				<th style="width: 15%">Actions</th>
-				<th style="width: 15%"></th>
+				<th style="width: 30%" aria-sort="@GetAriaSortAttribute("title")"><a role="link" tabindex="0" id="lnkTitle" @onclick=@(async () => await ReorderResultsAsync((orderedBy == BookOrder.ByTitleAscending ? BookOrder.ByTitleDescending : BookOrder.ByTitleAscending), "lnkTitle"))>Title </a><span aria-hidden="true" class=" @GetOrderedIcon("title")"></span></th>
+				<th style="width: 20%" aria-sort="@GetAriaSortAttribute("author")"><a role="link" tabindex="0" id="lnkAuthor" @onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByAuthorAscending ? BookOrder.ByAuthorDescending : BookOrder.ByAuthorAscending), "lnkAuthor"))>Author </a><span aria-hidden="true" class="@GetOrderedIcon("author")"></span></th>
+				<th style="width: 10%" aria-sort="@GetAriaSortAttribute("creationDate")"><a role="link" tabindex="0" id="lnkCreationDate" @onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByCreationDateAscending ? BookOrder.ByCreationDateDescending : BookOrder.ByCreationDateAscending), "lnkCreationDate"))>Creation date </a><span aria-hidden="true" class="@GetOrderedIcon("creationDate")"></span></th>
+				<th style="width : 20%" aria-sort="@GetAriaSortAttribute("numberOfDownloads")"><a role="link" tabindex="0" id="lnkNumberOfDownloads" @onclick=@(() => ReorderResultsAsync((orderedBy == BookOrder.ByNumberOFDownloadsAscending ? BookOrder.ByNumberOfDownloadsDescending : BookOrder.ByNumberOFDownloadsAscending), "lnkNumberOfDownloads"))>Downloads number </a><span aria-hidden="true" class="@GetOrderedIcon("numberOfDownloads")"></span></th>
+				<th style="width: 30%" colspan="2">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (var book in Books.Results)
+			@foreach (var book in booksToShow.Results)
 			{
 				var bookForLambdas = book;
 				<tr>
@@ -47,11 +47,11 @@ else
 	</table>
 	@if (Type == TableType.SearchResults)
 	{
-		<Pagination PaginationInfo="@Books?.PaginationInfo" QueryStringKey="pageNumber"></Pagination>
+		<Pagination PaginationInfo="@booksToShow?.PaginationInfo" QueryStringKey="pageNumber"></Pagination>
 	}
 	else
 	{
-		<Pagination PaginationInfo="@Books?.PaginationInfo"></Pagination>
+		<Pagination PaginationInfo="@booksToShow?.PaginationInfo"></Pagination>
 	}
 }
 
@@ -60,7 +60,7 @@ else
 
 	[Parameter] public int PageNumber { get; set; } = 1;
 
-	[Parameter] public string TableSummary { get; set; }
+	[Parameter] public string TableCaption { get; set; }
 
 	[Parameter] public TableType Type { get; set; }
 
@@ -70,8 +70,16 @@ else
 
 	[Parameter] public PaginatedResultsDto<Book> Books { get; set; }
 
+	private PaginatedResultsDto<Book> booksToShow { get; set; }
 	private BookOrder orderedBy { get; set; }
 
+	private Dictionary<string, BookOrder[]> headerDictionary = new Dictionary<string, BookOrder[]>()
+	{
+		{ "title", new [] { BookOrder.ByTitleAscending, BookOrder.ByTitleDescending } },
+		{ "author", new [] { BookOrder.ByAuthorAscending, BookOrder.ByAuthorDescending } },
+		{ "numberOfDownloads", new [] { BookOrder.ByNumberOFDownloadsAscending, BookOrder.ByNumberOfDownloadsDescending } },
+		{ "creationDate", new [] { BookOrder.ByCreationDateAscending, BookOrder.ByCreationDateDescending } }
+	};
 
 	protected override void OnInitialized()
 	{
@@ -84,6 +92,15 @@ else
 				orderedBy = BookOrder.ByTitleAscending;
 				break;
 		}
+	}
+
+	protected override Task OnParametersSetAsync()
+	{
+		if (booksToShow is null || !(Books is null))
+		{
+			booksToShow = Books;
+		}
+		return base.OnParametersSetAsync();
 	}
 
 	private async void DeleteBook(int bookId)
@@ -112,25 +129,33 @@ else
 		}
 	}
 
-	private string GetOrderedByText(string header)
+	private BookOrder[] GetOrderByHeader(string header)
 	{
-		Dictionary<string, BookOrder[]> headerDictionary = new Dictionary<string, BookOrder[]>()
-{
-{ "title", new BookOrder[] { BookOrder.ByTitleAscending, BookOrder.ByTitleDescending } },
-{ "author", new BookOrder[] { BookOrder.ByAuthorAscending, BookOrder.ByAuthorDescending } },
-{ "numberOfDownloads", new BookOrder[] { BookOrder.ByNumberOFDownloadsAscending, BookOrder.ByNumberOfDownloadsDescending } },
-{ "creationDate", new BookOrder[] { BookOrder.ByCreationDateAscending, BookOrder.ByCreationDateDescending } }
-};
 		if (!headerDictionary.ContainsKey(header))
 		{
 			throw new ArgumentException("The specified header (" + header + ") isn't inside supported headers for this function.");
 		}
-		var orders = headerDictionary[header];
+		return headerDictionary[header];
+	}
+
+	private string GetOrderedIcon(string header)
+	{
+		var orders = GetOrderByHeader(header);
 		if (orders.Contains(orderedBy))
 		{
 			return $" {(orderedBy.ToString().EndsWith("ascending", StringComparison.InvariantCultureIgnoreCase) ? "oi oi-arrow-top" : "oi oi-arrow-bottom")}";
 		}
 		return String.Empty;
+	}
+
+	private string GetAriaSortAttribute(string header)
+	{
+		var orders = GetOrderByHeader(header);
+		if (orders.Contains(orderedBy))
+		{
+			return $"{(orderedBy.ToString().EndsWith("ascending", StringComparison.InvariantCultureIgnoreCase) ? "ascending" : "descending")}";
+		}
+		return "none";
 	}
 }
 

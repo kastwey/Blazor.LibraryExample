@@ -12,12 +12,12 @@
 
 <h2>Search</h2>
 <label for="TxtSearch">Search:</label>
-<input type="search" id="txtSearch" @bind="txtSearch" @onkeypress="TxtSearchKeypress" />
+<input type="search" id="txtSearch" @bind="txtSearch" />
 <button @onclick="SearchBooks" @ref="btnSearch">Search books</button>
 @if (!String.IsNullOrWhiteSpace(searchTerm))
 {
 	<h3 id="headerResults">Search results:</h3>
-	<BooksTable TableSummary="Table with search results." Type="@TableType.SearchResults" PageNumber="@pageNumber" SearchTerm=@searchTerm RootPage="@this" OnHeaderClicked="@OnHeaderClicked"  Books="@books"></BooksTable>
+	<BooksTable TableCaption="Table with search results." Type="@TableType.SearchResults" PageNumber="@pageNumber" SearchTerm=@searchTerm RootPage="@this" OnHeaderClicked="@OnHeaderClicked"  Books="@books"></BooksTable>
 }
 
 @code
@@ -33,14 +33,6 @@
 
 	private PaginatedResultsDto<Book> books;
 
-	private async Task TxtSearchKeypress(KeyboardEventArgs e)
-	{
-		if (e.Key == "Enter")
-		{
-			await Interop.JsInterop.FocusAsync(JSRuntime, btnSearch);
-			await Interop.JsInterop.ClickAsync(JSRuntime, btnSearch);
-		}
-	}
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -52,6 +44,7 @@
 
 	private async void OnLocationChanges(object sender, LocationChangedEventArgs e)
 	{
+		await JSRuntime.InvokeVoidAsync("alert", "¡Ejecutado locationChange!");
 		await GetQueryStringParametersAsync();
 	}
 
@@ -74,7 +67,7 @@
 		}
 		catch (Exception ex)
 		{
-			await Interop.JsInterop.AlertAsync(JSRuntime, $"Error while retrieving books: {ex.Message}.");
+			await Interop.JsInterop.AlertAsync(JSRuntime, $"Error while retrieving books: {ex.Message} {ex.StackTrace}.");
 		}
 		this.QuerySelectorToFocusAfterRendering = "#headerResults";
 		StateHasChanged();
@@ -86,14 +79,16 @@
 		base.Dispose();
 	}
 
-	private void SearchBooks()
+	private async Task SearchBooks()
 	{
 		if (String.IsNullOrWhiteSpace(txtSearch))
 		{
+			await JSRuntime.InvokeVoidAsync("alert", "está vacío!");
 			this.QuerySelectorToFocusAfterRendering = "#txtSearch";
 			return;
 		}
-		NavigationManager.NavigateTo($"/books/search?searchTerm={txtSearch}&pageNumber={pageNumber}");
+		await JSRuntime.InvokeVoidAsync("alert", txtSearch);
+		NavigationManager.NavigateTo($"/books/search?searchTerm=tarararara&pageNumber={pageNumber}");
 	}
 
 	private async Task OnHeaderClicked(BooksTableHeaderClickedEventArgs e)

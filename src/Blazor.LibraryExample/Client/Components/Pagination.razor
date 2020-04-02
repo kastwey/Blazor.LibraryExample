@@ -5,14 +5,14 @@
 
 @if (PaginationInfo != null && PaginationInfo.TotalRows > 0)
 {
-    <nav aria-label="Page navigation example">
+    <nav aria-label="Page navigation">
         <ul class="pagination">
             @for (int i = 1; i <= PaginationInfo.TotalPages; i++)
             {
                 <li class="page-item @(i == PaginationInfo.CurrentPage ? "active" : string.Empty)">
                     @if (i == PaginationInfo.CurrentPage)
                     {
-                        <a class="page-link">@i</a>
+                        <a aria-current="page" class="page-link">@i</a>
                     }
                     else
                     {
