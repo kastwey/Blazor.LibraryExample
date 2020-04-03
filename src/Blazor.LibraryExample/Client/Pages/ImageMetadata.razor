@@ -1,0 +1,57 @@
+﻿@page "/ImageMetadata"
+@using System.IO
+@using Blazor.LibraryExample.Shared.Entities
+@using Blazor.LibraryExample.Shared.Interfaces
+@inject IImageProcessorService imageProcessorService
+@inject IJSRuntime jsRuntime
+@inject HttpClient httpClient
+@{
+	Title = "image metadata example";
+}
+<h2>Image metadata</h2>
+<InputFile OnChange="HandleFileSelected" />
+
+@if (!String.IsNullOrWhiteSpace(alert))
+{
+	<p role="alert">@alert</p>
+}
+@if (photo != null)
+{
+	<dl>
+		<dt>Label:</dt>
+		<dd>@photo.Label</dd>
+		@if (photo.TakenDate.HasValue)
+		{
+		<dt>Taken date:</dt>
+		<dd>@photo.TakenDate</dd>
+		}
+		@if (photo.ModifiedDate.HasValue)
+		{
+			<dt>Modified date:</dt>
+			<dd>@photo.ModifiedDate</dd>
+		}
+	</dl>
+}
+
+@code
+{
+
+	private Photo photo;
+
+	private string alert;
+
+	private async Task HandleFileSelected(IFileListEntry[] files)
+	{
+		try
+		{
+			var file = files.First();
+			alert = "Loading metadata...";
+			photo = await imageProcessorService.GetImageMetadataAsync((await file.ReadAllAsync(10000000)).ToArray(), file.Name);
+			alert = "Metadata loaded";
+		}
+		catch (Exception ex)
+		{
+			alert = ex.Message;
+		}
+	}
+}
