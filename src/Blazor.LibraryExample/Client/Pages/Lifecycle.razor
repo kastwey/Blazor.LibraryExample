@@ -1,0 +1,45 @@
+﻿@page "/Lifecycle"
+@using System.Text
+@{
+	Title = "Lifecycle.";
+}
+<h2>Lifecycle</h2>
+@if (cycle.Length > 0)
+{
+	var lines = cycle.ToString().Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+	<ul>
+		@foreach (var line in lines)
+		{
+			<li>@line</li>
+		}
+	</ul>
+}
+
+@code
+{
+
+	private StringBuilder cycle = new StringBuilder();
+
+	protected override Task OnInitializedAsync()
+	{
+		var message = "Lifecycle initialized! You can initialize variables, call apis to get data, ETC.";
+		cycle.AppendLine(message);
+		Console.WriteLine(message);
+		return base.OnInitializedAsync();
+	}
+
+	protected override Task OnParametersSetAsync()
+	{
+		var message = "Parameters set successfully! You can get them if you are using parameters in this component.";
+		cycle.AppendLine(message);
+		Console.WriteLine(message);
+		return base.OnParametersSetAsync();
+	}
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		var message = "This component is already rendered! You can use javascript functions against DOM, because all elements have been rendered.";
+		Console.WriteLine(message);
+		base.OnAfterRender(firstRender);
+	}
+}

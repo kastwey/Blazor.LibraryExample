@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using Blazor.LibraryExample.Server.Contracts.Repositories;
 using Blazor.LibraryExample.Server.Data;
 using Blazor.LibraryExample.Server.Repositories;
 using Blazor.LibraryExample.Shared.Entities;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -15,7 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using Newtonsoft.Json;
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Blazor.LibraryExample.Server
 {
@@ -42,11 +45,6 @@ namespace Blazor.LibraryExample.Server
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddMvc();
-			services.AddResponseCompression(opts =>
-			{
-				opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-					new[] { "application/octet-stream" });
-			});
 			services.AddDbContext<LibraryContext>(options =>
 			{
 				options.UseSqlite(configuration.GetValue<string>("Data:ConnectionString"));
@@ -62,23 +60,21 @@ namespace Blazor.LibraryExample.Server
 		/// <param name="libraryContext">The library context.</param>
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, LibraryContext libraryContext)
 		{
-			app.UseResponseCompression();
-
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
-				app.UseBlazorDebugging();
+				app.UseWebAssemblyDebugging();
 			}
 
 			app.UseStaticFiles();
-			app.UseClientSideBlazorFiles<Client.Program>();
+			app.UseBlazorFrameworkFiles();
 
 			app.UseRouting();
 
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapDefaultControllerRoute();
-				endpoints.MapFallbackToClientSideBlazor<Client.Program>("index.html");
+				endpoints.MapFallbackToFile("index.html");
 			});
 
 			// Fill and create the database if does not exists.

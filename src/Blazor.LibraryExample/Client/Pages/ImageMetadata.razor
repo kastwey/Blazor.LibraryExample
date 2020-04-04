@@ -3,6 +3,7 @@
 @using Blazor.LibraryExample.Shared.Entities
 @using Blazor.LibraryExample.Shared.Interfaces
 @inject IImageProcessorService imageProcessorService
+@inject IOpenCageDataAgent openCageDataAgent
 @inject IJSRuntime jsRuntime
 @inject HttpClient httpClient
 @{
@@ -30,6 +31,13 @@
 			<dt>Modified date:</dt>
 			<dd>@photo.ModifiedDate</dd>
 		}
+		
+		@if (location != null)
+		{
+			<dt>Location:</dt>
+			<dd>@location</dd>
+		}
+
 	</dl>
 }
 
@@ -40,6 +48,8 @@
 
 	private string alert;
 
+	private string location;
+
 	private async Task HandleFileSelected(IFileListEntry[] files)
 	{
 		try
@@ -47,6 +57,7 @@
 			var file = files.First();
 			alert = "Loading metadata...";
 			photo = await imageProcessorService.GetImageMetadataAsync((await file.ReadAllAsync(10000000)).ToArray(), file.Name);
+			location = await openCageDataAgent.GetFormatedLocationAsync(photo.Latitude.Value, photo.Longitude.Value);
 			alert = "Metadata loaded";
 		}
 		catch (Exception ex)

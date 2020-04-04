@@ -15,11 +15,11 @@ namespace Blazor.LibraryExample.Shared.Entities
 
 		public DateTime? ModifiedDate { get; set; }
 
-		public double Latitude { get; set; }
+		public double? Latitude { get; set; }
 
-		public double Longitude { get; set; }
+		public double? Longitude { get; set; }
 
-		public double Altitude { get; set; }
+		public string Altitude { get; set; }
 
 		public string LocationDesc { get; set; }
 

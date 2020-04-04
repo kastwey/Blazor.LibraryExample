@@ -5,8 +5,10 @@ using MetadataExtractor.Formats.QuickTime;
 using MetadataExtractor.Formats.Xmp;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Blazor.LibraryExample.Shared.Implementation
@@ -66,12 +68,38 @@ namespace Blazor.LibraryExample.Shared.Implementation
 				}
 			}
 
+			var gpsMeta = data.SingleOrDefault(d => d.Name == "GPS");
+			if (gpsMeta != null)
+			{
+				AddGpsMeta(photo, gpsMeta);
+			}
 			labels = labels.Distinct().ToList();
 			if (labels.Any())
 			{
 				photo.Label = String.Join(Environment.NewLine, labels);
 			}
 			return photo;
+		}
+
+		private void AddGpsMeta(Photo photo, MetadataExtractor.Directory gpsMeta)
+		{
+			var latitudeTag = gpsMeta.Tags.SingleOrDefault(t => t.Name == "GPS Latitude");
+			var longitudeTag = gpsMeta.Tags.SingleOrDefault(t => t.Name == "GPS Longitude");
+			var altitudeTag = gpsMeta.Tags.SingleOrDefault(t => t.Name == "GPS Altitude");
+			if (latitudeTag != null)
+			{
+				photo.Latitude = GetCoordinateFromDegrees(latitudeTag);
+			}
+
+			if (longitudeTag != null)
+			{
+				photo.Longitude = GetCoordinateFromDegrees(longitudeTag);
+			}
+
+			if (altitudeTag != null)
+			{
+				photo.Altitude = altitudeTag.Description;
+			}
 		}
 
 		private static void AddQuickTimeMetaCreationDate(MetadataExtractor.Directory quickTimeMeta, Photo photo)
@@ -146,5 +174,22 @@ namespace Blazor.LibraryExample.Shared.Implementation
 				labels.Add(tag.Description);
 			}
 		}
+
+		private double GetCoordinateFromDegrees(Tag tag)
+		{
+			var regexDegrees = new Regex(@"^(?<hours>\-?\d+)°\s(?<minutes>[\d,]+?)'\s(?<seconds>[\d\,]+)", RegexOptions.Compiled);
+			var cultureInfo = CultureInfo.CreateSpecificCulture("en-US");
+			var fmt = new NumberFormatInfo();
+			fmt.NegativeSign = "-";
+			fmt.NumberDecimalSeparator = ",";
+			var tagString = tag.Description;
+			var result = regexDegrees.Match(tagString);
+			var hours = double.Parse(result.Groups["hours"].Value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowTrailingSign, fmt);
+			var minutes = double.Parse(result.Groups["minutes"].Value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowTrailingSign, fmt);
+			var seconds = double.Parse(result.Groups["seconds"].Value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowTrailingSign, fmt);
+			return hours + (minutes / 60) + (seconds / 3600);
+		}
+
+
 	}
 }

@@ -1,7 +1,10 @@
-﻿namespace Blazor.LibraryExample.Shared.INterfaces
+﻿using System.Threading.Tasks;
+
+namespace Blazor.LibraryExample.Shared.Interfaces
 {
 	public interface IOpenCageDataAgent
 	{
-		object GetFormatedLocation(double latitude, double longitude);
+		
+		Task<string> GetFormatedLocationAsync(double latitude, double longitude);
 	}
 }
